@@ -1,0 +1,6 @@
+apiVersion: v2
+name: pm-ai-tool
+description: PM AI Tool — Phase 5 on-prem / K8s baseline
+type: application
+version: 0.1.0
+appVersion: '0.1.0'

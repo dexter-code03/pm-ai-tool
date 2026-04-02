@@ -1,0 +1,40 @@
+/* ═══════════════════════════════════════════════════════════
+   PM AI TOOL — Design Tokens
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+  /* ─── Background Scale ─── */
+  --bg-base:      #080C14;
+  --bg-surface:   #0E1421;
+  --bg-elevated:  #151C2E;
+  --bg-hover:     #1C2438;
+  --bg-active:    #1F2B42;
+
+  /* ─── Borders ─── */
+  --border:       rgba(255,255,255,0.06);
+  --border-light: rgba(255,255,255,0.10);
+
+  /* ─── Brand Colors ─── */
+  --indigo:       #5B7EF8;
+  --indigo-dim:   rgba(91,126,248,0.15);
+  --indigo-glow:  rgba(91,126,248,0.30);
+  --teal:         #2DD4B7;
+  --teal-dim:     rgba(45,212,183,0.12);
+  --amber:        #F59E0B;
+  --amber-dim:    rgba(245,158,11,0.15);
+  --red:          #EF4444;
+  --red-dim:      rgba(239,68,68,0.12);
+  --green:        #22C55E;
+  --green-dim:    rgba(34,197,94,0.12);
+
+  /* ─── Text ─── */
+  --text-primary:   #E4EAF8;
+  --text-secondary: #8893AB;
+  --text-muted:     #4E5A72;
+
+  /* ─── Layout ─── */
+  --sidebar-w: 240px;
+
+  /* ─── Transitions ─── */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}

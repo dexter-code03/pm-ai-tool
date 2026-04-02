@@ -1,0 +1,13 @@
+replicaCount: 1
+image:
+  repository: pm-ai-tool
+  tag: latest
+  pullPolicy: IfNotPresent
+service:
+  type: ClusterIP
+  port: 3001
+ingress:
+  enabled: false
+env:
+  DATABASE_URL: ''
+  JWT_SECRET: ''

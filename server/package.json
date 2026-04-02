@@ -1,0 +1,47 @@
+{
+  "name": "pm-ai-tool-server",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node index.js",
+    "start": "node index.js",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:studio": "prisma studio",
+    "seed:user": "node scripts/seed-user.js",
+    "verify:stubs": "bash scripts/verify-no-stubs.sh"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1019.0",
+    "@aws-sdk/s3-request-presigner": "^3.1019.0",
+    "@google/stitch-sdk": "^0.0.3",
+    "@node-rs/argon2": "^2.0.2",
+    "@prisma/client": "^6.0.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "docx": "^9.0.0",
+    "dotenv": "^16.4.0",
+    "express": "^4.21.0",
+    "express-rate-limit": "^7.5.0",
+    "ioredis": "^5.10.1",
+    "jsonwebtoken": "^9.0.2",
+    "jwks-rsa": "^4.0.1",
+    "level": "^10.0.0",
+    "nodemailer": "^8.0.4",
+    "openai": "^4.70.0",
+    "passport": "^0.7.0",
+    "passport-saml": "^3.2.4",
+    "puppeteer": "^24.40.0",
+    "rate-limit-redis": "^4.3.1",
+    "stripe": "^21.0.1",
+    "ws": "^8.18.0",
+    "y-leveldb": "^0.2.0",
+    "y-websocket": "^3.0.0",
+    "yjs": "^13.6.30"
+  },
+  "devDependencies": {
+    "prisma": "^6.0.0"
+  }
+}

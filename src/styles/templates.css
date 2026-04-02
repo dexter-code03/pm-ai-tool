@@ -1,0 +1,119 @@
+/* ═══════════════════════════════════════════════════════════
+   PM AI TOOL — Template Library
+   ═══════════════════════════════════════════════════════════ */
+
+.tpl-page { padding: 32px 48px; max-width: 1200px; margin: 0 auto; color: var(--text-primary); }
+
+.tpl-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 40px; }
+.tpl-title { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 6px; }
+.tpl-subtitle { font-size: 14px; color: var(--text-muted); }
+.tpl-actions { display: flex; gap: 12px; }
+
+.tpl-section { margin-bottom: 48px; }
+.tpl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+
+/* ─── TEMPLATE CARDS ─── */
+.tpl-card {
+  background: var(--bg-elevated); border: 1px solid var(--border);
+  border-radius: 12px; padding: 20px;
+  display: flex; flex-direction: column; gap: 16px;
+  position: relative; overflow: hidden;
+  transition: all 0.2s;
+}
+.tpl-card:hover { border-color: rgba(91,126,248,0.3); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+.tpl-card.default::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--indigo), var(--teal));
+}
+
+.tpl-card-top { display: flex; align-items: flex-start; gap: 14px; }
+.tpl-card-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+}
+.tpl-card-info { flex: 1; }
+.tpl-card-name { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 4px; letter-spacing: -0.2px; }
+.tpl-card-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+.tpl-badge {
+  font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px;
+  text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0;
+}
+.tpl-badge.default { background: var(--indigo-dim); color: var(--indigo); }
+.tpl-badge.custom { background: var(--bg-active); color: var(--text-secondary); }
+
+.tpl-card-meta { display: flex; gap: 16px; font-size: 11.5px; color: var(--text-muted); padding-bottom: 12px; border-bottom: 1px solid var(--border-light); }
+.tpl-card-meta span { display: flex; align-items: center; gap: 5px; }
+
+.tpl-card-sections { display: flex; flex-wrap: wrap; gap: 6px; }
+.tpl-section-tag {
+  font-size: 10.5px; font-weight: 600; padding: 3px 8px; border-radius: 6px;
+  background: var(--bg-base); color: var(--text-secondary); border: 1px solid var(--border);
+}
+.tpl-section-tag.more { background: var(--bg-active); border: none; color: var(--text-muted); }
+
+.tpl-card-actions { display: flex; gap: 8px; margin-top: auto; }
+.tpl-use-btn { flex: 1; text-align: center; }
+
+/* ─── TEMPLATE EDITOR MODAL ─── */
+.tpl-editor-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  animation: fadeIn 0.2s;
+}
+.tpl-editor {
+  background: var(--bg-elevated); border: 1px solid var(--border-light);
+  border-radius: 16px; width: 1000px; max-width: 95vw; height: 85vh; max-height: 800px;
+  display: flex; flex-direction: column;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+  animation: modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tpl-editor-header { padding: 24px 32px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.tpl-editor-header h2 { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; }
+.tpl-editor-body { display: flex; flex: 1; overflow: hidden; }
+
+.tpl-editor-left { width: 340px; padding: 24px 32px; border-right: 1px solid var(--border); background: var(--bg-base); overflow-y: auto; }
+.tpl-editor-right { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+.tpl-editor-sections-header { padding: 20px 32px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--bg-base); }
+.tpl-editor-sections { flex: 1; overflow-y: auto; padding: 24px 32px; background: var(--bg-elevated); display: flex; flex-direction: column; gap: 12px; }
+
+.tpl-section-item {
+  background: var(--bg-base); border: 1px solid var(--border);
+  border-radius: 10px; display: flex; align-items: flex-start;
+  transition: all 0.2s;
+}
+.tpl-section-item.drag-over { border-color: var(--indigo); border-width: 2px; transform: scale(1.02); }
+.tpl-section-item.dragging { opacity: 0.5; }
+
+.tpl-section-drag {
+  padding: 20px 12px; color: var(--text-muted); cursor: grab; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+}
+.tpl-section-content { flex: 1; padding: 16px 0; display: flex; flex-direction: column; gap: 10px; }
+.tpl-section-name-input {
+  background: transparent; border: none; font-size: 15px; font-weight: 600; font-family: 'DM Sans', sans-serif;
+  color: var(--text-primary); outline: none; width: 100%;
+}
+.tpl-section-row { display: flex; align-items: center; gap: 16px; }
+.tpl-section-type {
+  background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 6px;
+  color: var(--text-secondary); font-size: 12px; padding: 4px 8px; outline: none;
+}
+.tpl-section-required { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.tpl-section-guidance {
+  background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 8px;
+  padding: 10px 12px; font-size: 12.5px; color: var(--text-secondary); font-family: 'DM Sans', sans-serif;
+  width: 100%; resize: vertical; outline: none; transition: border-color 0.2s;
+}
+.tpl-section-guidance:focus { border-color: var(--indigo); }
+.tpl-section-delete {
+  padding: 20px; background: none; border: none; color: var(--text-muted); font-size: 16px; cursor: pointer;
+  transition: color 0.15s;
+}
+.tpl-section-delete:hover { color: var(--red); }
+
+.tpl-editor-footer { padding: 20px 32px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 12px; background: var(--bg-base); }

@@ -1,0 +1,139 @@
+/* ═══════════════════════════════════════════════════════════
+   PM AI TOOL — Wireframe Module Styles
+   ═══════════════════════════════════════════════════════════ */
+
+.wf-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.wf-card {
+  background: var(--bg-elevated); border: 1px solid var(--border);
+  border-radius: 14px; overflow: hidden; cursor: pointer;
+  transition: all 0.18s;
+}
+.wf-card:hover { border-color: rgba(45,212,183,0.3); transform: translateY(-2px); box-shadow: 0 12px 28px rgba(0,0,0,0.25); }
+.wf-preview {
+  height: 160px; background: var(--bg-base);
+  display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+}
+.wf-screens {
+  display: flex; gap: 6px; padding: 14px;
+  transform: perspective(400px) rotateY(-5deg) rotateX(3deg);
+}
+.wf-screen {
+  width: 56px; height: 96px; border-radius: 6px;
+  background: var(--bg-elevated); border: 1px solid var(--border-light);
+  display: flex; flex-direction: column; gap: 4px; padding: 5px; overflow: hidden;
+  flex-shrink: 0;
+}
+.wf-screen-bar { height: 5px; border-radius: 2px; background: var(--bg-active); }
+.wf-screen-bar.w60 { width: 60%; }
+.wf-screen-bar.w40 { width: 40%; }
+.wf-screen-bar.w80 { width: 80%; }
+.wf-screen-bar.accent { background: var(--indigo); }
+.wf-screen-bar.teal { background: var(--teal); width: 50%; height: 7px; }
+.wf-screen-box { flex: 1; background: var(--bg-active); border-radius: 3px; }
+.wf-card-info { padding: 14px 16px; }
+.wf-card-title { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 13.5px; color: var(--text-primary); margin-bottom: 4px; }
+.wf-card-meta { display: flex; gap: 10px; font-size: 11.5px; color: var(--text-muted); align-items: center; flex-wrap: wrap; }
+.wf-card-meta .screens-count { color: var(--teal); font-weight: 600; }
+
+.wf-new-card {
+  background: var(--bg-elevated); border: 2px dashed var(--border);
+  border-radius: 14px; height: 250px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 12px; cursor: pointer;
+  transition: all 0.18s; color: var(--text-muted);
+}
+.wf-new-card:hover { border-color: rgba(45,212,183,0.4); color: var(--teal); background: var(--teal-dim); }
+.wf-new-card .plus { font-size: 28px; font-weight: 300; }
+.wf-new-card p { font-size: 13px; font-weight: 500; }
+
+/* ─── CHIP TOGGLES (used in wireframe modal) ─── */
+.chip-group { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip-toggle {
+  padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500;
+  cursor: pointer; transition: all 0.15s; border: 1px solid var(--border);
+  background: var(--bg-base); color: var(--text-secondary);
+}
+.chip-toggle:hover { border-color: var(--border-light); color: var(--text-primary); }
+.chip-toggle.active { background: var(--teal-dim); color: var(--teal); border-color: rgba(45,212,183,0.3); }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 1100px) {
+  .wf-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 700px) {
+  .wf-grid { grid-template-columns: 1fr; }
+  .wf-new-card { height: 180px; }
+}
+
+/* ─── Flow canvas (ordered screens + arrows) ─── */
+.wf-flow-strip {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  overflow-x: auto;
+  padding: 8px 4px 20px;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+}
+.wf-flow-node {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  max-width: min(320px, 78vw);
+}
+.wf-flow-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 200px;
+}
+.wf-flow-shot {
+  background: var(--bg-base);
+  aspect-ratio: 16 / 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.wf-flow-shot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.wf-flow-meta {
+  padding: 12px 14px;
+  border-top: 1px solid var(--border);
+}
+.wf-flow-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+.wf-flow-prompt {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.wf-flow-arrow {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  min-height: 120px;
+  color: var(--teal);
+  opacity: 0.85;
+  align-self: center;
+}
+.wf-flow-arrow svg {
+  width: 28px;
+  height: 28px;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));
+}

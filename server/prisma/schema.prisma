@@ -1,0 +1,188 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         String   @default("EDITOR")
+  orgId        String?
+  organisation Organisation? @relation(fields: [orgId], references: [id])
+  settings     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  integrationConfigs IntegrationConfig[]
+  prds               Prd[]
+  wireframes         Wireframe[]
+  prdVersionsCreated PrdVersion[] @relation("PrdVersionAuthor")
+  comments           Comment[]
+  notifications      Notification[]
+  auditLogs          AuditLog[]
+  generationMetrics  GenerationMetric[]
+}
+
+model Organisation {
+  id        String   @id @default(uuid())
+  name      String
+  settings  String?
+  createdAt DateTime @default(now())
+  users     User[]
+}
+
+model IntegrationConfig {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider        String
+  configEncrypted String
+  isConnected     Boolean  @default(false)
+  updatedAt       DateTime @updatedAt
+
+  @@unique([userId, provider])
+}
+
+model Prd {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orgId     String?
+  title     String
+  status    String   @default("draft")
+  content   String
+  jiraKey   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  versions PrdVersion[]
+  comments Comment[]
+  links    PrdWireframeLink[]
+}
+
+model PrdVersion {
+  id               String   @id @default(uuid())
+  prdId            String
+  prd              Prd      @relation(fields: [prdId], references: [id], onDelete: Cascade)
+  versionNumber    Int
+  label            String?
+  contentSnapshot  String
+  diffFromPrevious String?
+  createdById      String?
+  createdBy        User?    @relation("PrdVersionAuthor", fields: [createdById], references: [id])
+  createdAt        DateTime @default(now())
+}
+
+model Wireframe {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title           String
+  deviceType      String   @default("DESKTOP")
+  status          String   @default("ready")
+  stitchProjectId String?
+  flowGraph       String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  screens WireframeScreen[]
+  links   PrdWireframeLink[]
+}
+
+model WireframeScreen {
+  id              String    @id @default(uuid())
+  wireframeId     String
+  wireframe       Wireframe @relation(fields: [wireframeId], references: [id], onDelete: Cascade)
+  title           String?
+  prompt          String?
+  order           Int
+  screenshotUrl   String?
+  htmlUrl         String?
+  stitchScreenId  String?
+  editHistory     String?
+  figmaExportUrl  String?
+  prototypeData   String?
+
+  @@index([wireframeId, order])
+}
+
+model PrdWireframeLink {
+  id          String    @id @default(uuid())
+  prdId       String
+  prd         Prd       @relation(fields: [prdId], references: [id], onDelete: Cascade)
+  wireframeId String
+  wireframe   Wireframe @relation(fields: [wireframeId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  unlinkedAt  DateTime?
+
+  @@unique([prdId, wireframeId])
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  prdId     String
+  prd       Prd      @relation(fields: [prdId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  sectionId String
+  content   String
+  status    String   @default("open")
+  createdAt DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  prdId     String?
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  orgId      String?
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+  action     String
+  entityType String
+  entityId   String?
+  metadata   String?
+  ip         String?
+  createdAt  DateTime @default(now())
+}
+
+model GenerationMetric {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind       String
+  durationMs Int
+  createdAt  DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([createdAt])
+}
+
+model Template {
+  id           String   @id @default(uuid())
+  name         String
+  description  String?
+  ownerId      String?
+  orgId        String?
+  visibility   String   @default("personal")
+  promptRecipe String?
+  tags         String?
+  version      Int      @default(1)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
