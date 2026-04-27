@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { api, generatePrd, type PrdRow } from '../lib/api';
 import { useToast } from '../hooks/useToast';
 import { GeneratePrdModal } from '../components/GeneratePrdModal';
@@ -50,8 +50,14 @@ export function DashboardPage() {
   async function handleGenerate(opts: { method: string; brief?: string; template: string; jiraUrl?: string; pasteContent?: string; title?: string; userStory?: string; ac?: string }) {
     setGenerating(true);
     try {
-      const brief = opts.brief || opts.pasteContent || [opts.title, opts.userStory, opts.ac].filter(Boolean).join('\n\n') || undefined;
-      const { prd } = await generatePrd({ brief, templateHint: opts.template });
+      const jiraContext = opts.method === 'jira' && opts.jiraUrl ? { url: opts.jiraUrl } : undefined;
+      const brief =
+        opts.brief ||
+        opts.pasteContent ||
+        (opts.method === 'jira' && opts.jiraUrl ? `Generate a PRD for Jira ticket at: ${opts.jiraUrl}` : undefined) ||
+        [opts.title, opts.userStory, opts.ac].filter(Boolean).join('\n\n') ||
+        undefined;
+      const { prd } = await generatePrd({ brief, templateHint: opts.template, jiraContext });
       setShowGenModal(false);
       showToast('PRD generated successfully!', 'success');
       navigate(`/prd/${prd.id}`);
