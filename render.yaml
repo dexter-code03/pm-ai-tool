@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: pm-ai-tool
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build && cd server && npx prisma generate
+    startCommand: cd server && npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 20.20.2
+      - key: DATABASE_URL
+        fromDatabase:
+          name: pm-ai-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: FRONTEND_URL
+        value: https://pm-ai-tool.onrender.com
+      - key: NODE_ENV
+        value: production
+
+databases:
+  - name: pm-ai-db
+    databaseName: pm_ai
+    user: pm
+    plan: free

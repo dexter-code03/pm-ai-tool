@@ -2,6 +2,11 @@ import './load-env.js';
 import http from 'http';
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 import passport from 'passport';
 import { prisma } from './lib/prisma.js';
 import { assertProductionJwtSecret } from './lib/env.js';
@@ -268,6 +273,16 @@ app.post('/api/v1/notifications/read-all', authMiddleware, async (req, res) => {
 app.use((err, _req, res, _next) => {
   console.error(err);
   res.status(500).json({ error: err.message || 'Server error' });
+});
+
+// Serve frontend in production
+app.use(express.static(path.join(__dirname, '../apps/web/dist')));
+app.get('*', (req, res) => {
+  if (!req.path.startsWith('/api')) {
+    res.sendFile(path.join(__dirname, '../apps/web/dist/index.html'));
+  } else {
+    res.status(404).json({ error: 'Not found' });
+  }
 });
 
 const server = http.createServer(app);
