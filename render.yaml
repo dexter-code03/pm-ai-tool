@@ -3,7 +3,7 @@ services:
     name: pm-ai-tool
     env: node
     plan: free
-    buildCommand: npm install && npm run build && cd server && npx prisma generate
+    buildCommand: npm install --include=dev && npm run build && cd server && npx prisma generate
     startCommand: cd server && npm start
     envVars:
       - key: NODE_VERSION
