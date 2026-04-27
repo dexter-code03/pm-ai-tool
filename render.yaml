@@ -3,8 +3,8 @@ services:
     name: pm-ai-tool
     env: node
     plan: free
-    buildCommand: npm install --include=dev && npm run build && cd server && npx prisma generate
-    startCommand: cd server && npm start
+    buildCommand: npm install && npm run build && cd server && npx prisma generate
+    startCommand: cd server && NODE_ENV=production npm start
     envVars:
       - key: NODE_VERSION
         value: 20.20.2
@@ -16,8 +16,6 @@ services:
         generateValue: true
       - key: FRONTEND_URL
         value: https://pm-ai-tool.onrender.com
-      - key: NODE_ENV
-        value: production
       - key: NODE_OPTIONS
         value: --max-old-space-size=400
 
