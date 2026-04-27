@@ -18,6 +18,8 @@ services:
         value: https://pm-ai-tool.onrender.com
       - key: NODE_ENV
         value: production
+      - key: NODE_OPTIONS
+        value: --max-old-space-size=400
 
 databases:
   - name: pm-ai-db
