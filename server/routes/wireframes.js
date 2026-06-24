@@ -11,8 +11,30 @@ import {
   getGenerationProgress
 } from '../services/stitch.js';
 import { recordGenerationMetric } from '../lib/generationMetrics.js';
+import { createReadStream, existsSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const SCREENSHOT_CACHE_DIR = join(__dirname, '../cache/screenshots');
 
 const router = Router();
+
+// Serve locally-cached Stitch screenshots (permanent URLs, no expiry)
+router.get('/screens/:screenId/screenshot', async (req, res) => {
+  const { screenId } = req.params;
+  // Validate screenId is a uuid-like string to prevent path traversal
+  if (!/^[a-zA-Z0-9_-]{1,64}$/.test(screenId)) {
+    return res.status(400).json({ error: 'Invalid screen ID' });
+  }
+  const filePath = join(SCREENSHOT_CACHE_DIR, `${screenId}.png`);
+  if (!existsSync(filePath)) {
+    return res.status(404).json({ error: 'Screenshot not found' });
+  }
+  res.setHeader('Content-Type', 'image/png');
+  res.setHeader('Cache-Control', 'public, max-age=86400');
+  createReadStream(filePath).pipe(res);
+});
 
 router.get('/', async (req, res) => {
   try {

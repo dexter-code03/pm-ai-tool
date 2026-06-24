@@ -253,14 +253,24 @@ router.post('/generate', async (req, res) => {
         parsed = parseAiJson(full);
       } catch (parseErr) {
         console.error('[PRD Generate OpenAI] JSON parse failed:', parseErr.message);
-        parsed = { title: 'Generated PRD', sections: [] };
+        console.error('[PRD Generate OpenAI] Raw (first 500):', full.slice(0, 500));
+        res.write(`data: ${JSON.stringify({ type: 'error', error: 'AI returned an unreadable response. Try again or check your API key.' })}\n\n`);
+        res.end();
+        return;
+      }
+
+      const openAiSections = parsed.sections || parsed.content || [];
+      if (!Array.isArray(openAiSections) || openAiSections.length === 0) {
+        res.write(`data: ${JSON.stringify({ type: 'error', error: 'AI generated no content. Provide more detail in your brief.' })}\n\n`);
+        res.end();
+        return;
       }
 
       const prd = await prisma.prd.create({
         data: {
           userId: req.user.userId,
           title: parsed.title || 'Generated PRD',
-          content: parsed.sections || parsed.content || [],
+          content: openAiSections,
           status: 'draft'
         }
       });
@@ -281,12 +291,13 @@ router.post('/generate', async (req, res) => {
     } catch (parseErr) {
       console.error('[PRD Generate] JSON parse failed:', parseErr.message);
       console.error('[PRD Generate] Raw response (first 500):', text.slice(0, 500));
-      parsed = { title: 'Generated PRD', sections: [] };
+      return res.status(500).json({ error: 'AI returned an unreadable response. Try again or switch to a stronger model (e.g. GPT-4o).' });
     }
 
     const sections = parsed.sections || parsed.content || [];
     if (!Array.isArray(sections) || sections.length === 0) {
       console.warn('[PRD Generate] No sections found. Keys in parsed:', Object.keys(parsed));
+      return res.status(500).json({ error: 'AI generated no content. Provide more detail in your brief or try a different template.' });
     }
 
     const prd = await prisma.prd.create({

@@ -66,6 +66,13 @@ export function GeneratePrdModal({ open, onClose, onGenerate, generating }: Prop
 
   if (!open) return null;
 
+  const canGenerate = !generating && (() => {
+    if (method === 'jira') return !!jiraUrl.trim();
+    if (method === 'paste') return !!pasteContent.trim();
+    if (method === 'manual') return !!title.trim();
+    return false;
+  })();
+
   return (
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center"
@@ -183,8 +190,8 @@ export function GeneratePrdModal({ open, onClose, onGenerate, generating }: Prop
           <button
             type="button"
             className="rounded-lg px-3.5 py-1.5 text-[13px] font-medium text-white shadow transition-all hover:-translate-y-px disabled:opacity-50"
-            style={{ background: 'var(--indigo)', boxShadow: '0 2px 8px rgba(91,126,248,0.35)' }}
-            disabled={generating}
+            style={{ background: canGenerate ? 'var(--indigo)' : 'var(--text-muted)', boxShadow: canGenerate ? '0 2px 8px rgba(91,126,248,0.35)' : 'none' }}
+            disabled={!canGenerate}
             onClick={handleGenerate}
           >
             {generating ? '⏳ Generating…' : '✨ Generate PRD'}

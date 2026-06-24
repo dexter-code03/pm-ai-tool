@@ -304,9 +304,14 @@ export function WireframeDetailPage() {
                   <div key={s.id} className="overflow-hidden rounded-xl border transition-all hover:border-[var(--border-light)]" style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border)' }}>
                     <div className="relative flex items-center justify-center" style={{ background: 'var(--bg-base)', height: isMobile ? 220 : 160 }}>
                       {s.screenshotUrl ? (
-                        <img src={s.screenshotUrl} alt={s.title || ''} className="h-full w-full object-cover" />
-                      ) : (
-                        <div className="flex h-full w-full flex-col" style={{ padding: isMobile ? '8px 12px' : '8px 16px' }}>
+                        <img
+                          src={s.screenshotUrl}
+                          alt={s.title || ''}
+                          className="h-full w-full object-cover"
+                          onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; (e.currentTarget.nextSibling as HTMLElement | null)?.removeAttribute('hidden'); }}
+                        />
+                      ) : null}
+                      <div hidden={!!s.screenshotUrl} className="flex h-full w-full flex-col" style={{ padding: isMobile ? '8px 12px' : '8px 16px' }}>
                           {isMobile && (
                             <div className="mb-1 flex items-center justify-between px-1 text-[8px] text-[var(--text-muted)]" style={{ opacity: 0.5 }}>
                               <span>9:41</span>
@@ -326,7 +331,6 @@ export function WireframeDetailPage() {
                             <div className="mx-auto mt-1 h-[3px] w-[32px] rounded-full" style={{ background: 'var(--text-muted)', opacity: 0.3 }} />
                           )}
                         </div>
-                      )}
                       <div className="absolute left-2 top-2 flex h-5 w-5 items-center justify-center rounded-full text-[9px] font-bold text-white" style={{ background: 'var(--indigo)' }}>
                         {idx + 1}
                       </div>

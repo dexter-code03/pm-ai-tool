@@ -1,6 +1,40 @@
 import { prisma } from '../lib/prisma.js';
 import { fromJson } from '../lib/json.js';
 import { callLLM, getActiveAiConfig } from './ai.js';
+import { createWriteStream, existsSync, mkdirSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+import { pipeline } from 'stream/promises';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const SCREENSHOT_CACHE_DIR = join(__dirname, '../cache/screenshots');
+
+if (!existsSync(SCREENSHOT_CACHE_DIR)) {
+  mkdirSync(SCREENSHOT_CACHE_DIR, { recursive: true });
+}
+
+/**
+ * Download a remote screenshot URL to local cache and update the screen's
+ * screenshotUrl in the DB to point at the local proxy endpoint.
+ * Runs fire-and-forget — failures are logged but don't break generation.
+ */
+async function cacheScreenshot(screenId, remoteUrl) {
+  if (!remoteUrl) return;
+  const localPath = join(SCREENSHOT_CACHE_DIR, `${screenId}.png`);
+  try {
+    const res = await fetch(remoteUrl);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    await pipeline(res.body, createWriteStream(localPath));
+    // Update DB to use permanent local proxy URL
+    await prisma.wireframeScreen.update({
+      where: { id: screenId },
+      data: { screenshotUrl: `/api/v1/wireframes/screens/${screenId}/screenshot` }
+    });
+    console.log(`[screenshot-cache] Saved ${screenId}.png`);
+  } catch (err) {
+    console.warn(`[screenshot-cache] Failed to cache ${screenId}:`, err.message);
+  }
+}
 
 const NON_UI_SCREEN_TYPES = new Set(['DOCUMENT', 'PROTOTYPE', 'PROTOTYPE_V2']);
 const NON_UI_DISPLAY_MODES = new Set(['MARKDOWN', 'STICKY_NOTE', 'CODE']);
@@ -231,7 +265,7 @@ export async function generateWireframesFromPrd({ prds, userId, deviceType, aiCo
 
       for (let i = 0; i < result.screens.length; i++) {
         const s = result.screens[i];
-        await prisma.wireframeScreen.create({
+        const created = await prisma.wireframeScreen.create({
           data: {
             wireframeId: wireframe.id,
             title: s.title,
@@ -244,6 +278,8 @@ export async function generateWireframesFromPrd({ prds, userId, deviceType, aiCo
             prototypeData: s.prototypeData ? JSON.stringify(s.prototypeData) : null,
           }
         });
+        // Cache screenshot locally before Stitch URL expires
+        void cacheScreenshot(created.id, s.screenshotUrl);
       }
 
       if (result.screens.length === 0) {
@@ -322,7 +358,7 @@ export async function generateStandaloneWireframe({ title, brief, userId, device
       });
       for (let i = 0; i < result.screens.length; i++) {
         const s = result.screens[i];
-        await prisma.wireframeScreen.create({
+        const created = await prisma.wireframeScreen.create({
           data: {
             wireframeId: wireframe.id, title: s.title, prompt: brief, order: i,
             screenshotUrl: s.screenshotUrl || null, htmlUrl: s.htmlUrl || null,
@@ -331,6 +367,7 @@ export async function generateStandaloneWireframe({ title, brief, userId, device
             prototypeData: s.prototypeData ? JSON.stringify(s.prototypeData) : null,
           }
         });
+        void cacheScreenshot(created.id, s.screenshotUrl);
       }
       if (result.screens.length === 0) throw new Error('Stitch did not return any UI screens.');
 
@@ -427,11 +464,12 @@ export async function syncStitchScreens({ wireframe, stitchApiKey }) {
       try {
         const screenshotUrl = await ns.getImage().catch(() => null);
         const htmlUrl = await ns.getHtml().catch(() => null);
-        await prisma.wireframeScreen.create({
+        const created = await prisma.wireframeScreen.create({
           data: { wireframeId: wireframe.id, title: ns.data?.title || 'New Screen',
             prompt: 'From Stitch', order: dbScreens.length + synced,
             screenshotUrl, htmlUrl, stitchScreenId: ns.id }
         });
+        void cacheScreenshot(created.id, screenshotUrl);
         synced++;
       } catch (err) { console.warn(`[Sync] New: ${err.message}`); }
     }
@@ -460,8 +498,10 @@ export async function editWireframeScreen({ wireframe, screenId, instruction, st
   }
   const editHistory = fromJson(screen.editHistory, []);
   editHistory.push({ instruction, timestamp: new Date().toISOString() });
-  return prisma.wireframeScreen.update({
+  const updated = await prisma.wireframeScreen.update({
     where: { id: screenId },
     data: { prompt: `${screen.prompt}\nEdit: ${instruction}`, editHistory, ...(newScreenshot ? { screenshotUrl: newScreenshot } : {}) }
   });
+  if (newScreenshot) void cacheScreenshot(screenId, newScreenshot);
+  return updated;
 }
